@@ -15,6 +15,8 @@
     width: 20em;
     height: 20em;
     position: relative;
+    margin: 1em;
+    display: inline-block;
 }
 
 .dropzone-active
@@ -58,10 +60,11 @@
 
 function onDragLeave(event)
 {
-    //console.log(event.target);
-    let found = getDropzone(ev);
-
-	found?.classList.remove("dropzone-active");
+    console.log(event);
+    let found = getDropzone(event);
+    //if (event.target == found)
+        //found.classList.remove("dropzone-active");
+ event.preventDefault();
 }
 
 
@@ -96,11 +99,14 @@ function drop_handler(ev) {
 
 function dragover_handler(ev)
 {
-	//console.log('doh', ev);
+	console.log('doh', ev);
 	
-	if (ev.dataTransfer.getData("application/hexfield-element"))
+    let found = getDropzone(ev);
+    
+	if (builder_globals.dragged)
 		//&& drop_ok(ev))
 	{
+
         ev.preventDefault();
 	}
 }
@@ -115,17 +121,18 @@ function getDropzone(ev)
 
 function dragenter_handler(ev)
 {
-	//console.log('doh', ev);
+	console.log('deh', ev);
 
     let found = getDropzone(ev);
 	
-	if (found && ev.dataTransfer.getData("application/hexfield-element"))
+	if (found && builder_globals.dragged)
 		//&& drop_ok(ev))
 	{
         ev.dataTransfer.dropEffect = "move";
 			
 		found.classList.add("dropzone-active");
         //console.log("active", ev.target);
+
         ev.preventDefault();
 	}
 }
@@ -138,14 +145,13 @@ function scatter()
     for ( let i = 0; i < 50; i++ )
     {
         let item = first.cloneNode(false);
-        let r = Math.random() * 255;
-        let g = Math.random() * 255;
-        let b = Math.random() * 255;
-        item.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        let h = Math.random() * 360;
+        item.style.backgroundColor = `hsl(${h}deg, 100%, 75%)`;
         let x = Math.random() * 20;
         let y = Math.random() * 20;
         item.style.left = `${x}em`;
         item.style.top = `${y}em`;
+        item.removeAttribute("id");
         main.append(item);
     }
 }
