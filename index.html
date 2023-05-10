@@ -12,8 +12,8 @@
 
 .dropzone
 {
-    width: 10em;
-    height: 10em;
+    width: 20em;
+    height: 20em;
     position: relative;
 }
 
@@ -23,6 +23,19 @@
 }
 
         </style>
+    </head>
+
+    <body>
+
+        <div id="main" class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+            <div id="first" class="dropitem" draggable="true" ondragstart="dragstart_move_handler(event)">
+            </div>
+        </div>
+        
+        <div class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+        </div>
+
+
         <script>
             
             builder_globals = {};
@@ -46,8 +59,9 @@
 function onDragLeave(event)
 {
     //console.log(event.target);
+    let found = getDropzone(ev);
 
-	event.target.classList.remove("dropzone-active");
+	found?.classList.remove("dropzone-active");
 }
 
 
@@ -62,13 +76,15 @@ function drop_handler(ev) {
 
 	 temp.innerHTML = data;
 
-    temp.firstElementChild.style.left = `${ev.clientX - ev.target.offsetLeft - builder_globals.offset.x}px`;
-    temp.firstElementChild.style.top = `${ev.clientY - ev.target.offsetTop - builder_globals.offset.y}px`;
+
+     let found = getDropzone(ev);
+
+    temp.firstElementChild.style.left = `${ev.clientX - found.offsetLeft - builder_globals.offset.x}px`;
+    temp.firstElementChild.style.top = `${ev.clientY - found.offsetTop - builder_globals.offset.y}px`;
  
-	ev.target.append( temp.firstElementChild );
+	found.append( temp.firstElementChild );
 
-
-    ev.target.classList.remove("dropzone-active");
+    found.classList.remove("dropzone-active");
 	  
     builder_globals.dragged.remove();
 
@@ -77,7 +93,6 @@ function drop_handler(ev) {
     console.log(ev);
     console.log(ev.pageX - ev.target.offsetLeft - builder_globals.offset.x, ev.pageY - ev.target.offsetTop - builder_globals.offset.y);
 }
-
 
 function dragover_handler(ev)
 {
@@ -90,34 +105,54 @@ function dragover_handler(ev)
 	}
 }
 
+function getDropzone(ev)
+{
+    if (ev.target.classList.contains("dropzone"))
+        return ev.target;
+    else if (ev.target.parentElement.classList.contains("dropzone"))
+        return ev.target.parentElement;
+}
+
 function dragenter_handler(ev)
 {
 	//console.log('doh', ev);
+
+    let found = getDropzone(ev);
 	
-	if (ev.target.classList.contains("dropzone") && ev.dataTransfer.getData("application/hexfield-element"))
+	if (found && ev.dataTransfer.getData("application/hexfield-element"))
 		//&& drop_ok(ev))
 	{
         ev.dataTransfer.dropEffect = "move";
 			
-		ev.target.classList.add("dropzone-active");
+		found.classList.add("dropzone-active");
         //console.log("active", ev.target);
         ev.preventDefault();
 	}
 }
 
+function scatter()
+{
+    let main = document.querySelector("#main");
+    let first = document.querySelector("#first");
+
+    for ( let i = 0; i < 50; i++ )
+    {
+        let item = first.cloneNode(false);
+        let r = Math.random() * 255;
+        let g = Math.random() * 255;
+        let b = Math.random() * 255;
+        item.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        let x = Math.random() * 20;
+        let y = Math.random() * 20;
+        item.style.left = `${x}em`;
+        item.style.top = `${y}em`;
+        main.append(item);
+    }
+}
+
+scatter();
+
         </script>
-    </head>
-
-    <body>
-
-        <div class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
-            <div class="dropitem" draggable="true" ondragstart="dragstart_move_handler(event)">
-            </div>
-        </div>
-        
-        <div class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
-        </div>
 
     </body>
-
 </html>
