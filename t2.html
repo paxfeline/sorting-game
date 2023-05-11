@@ -96,7 +96,7 @@ game.addEventListener("pointerdown",
             e.target.parentElement.append(e.target);
             //gameState.original = e.target;
             gameState.dragging = e.target; //.cloneNode();
-            main.append(gameState.dragging);
+            //main.append(gameState.dragging);
             //gameState.dragging.classList.add("dragitem-dragging");
             gameState.offset = {x: e.offsetX, y: e.offsetY};
             gameState.start = {x: e.pageX, y: e.pageY};
@@ -126,7 +126,7 @@ game.addEventListener("pointermove",
 
         let t = gameState.dragging;
 
-        console.log(Number(t.dataset.y) + (e.pageY - gameState.start.y));
+        console.log(`${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px\n${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`);
 
         t.style.left = `${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px`;
         t.style.top = `${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`;
@@ -193,7 +193,7 @@ game.addEventListener("pointerup",
 
         d.append(t);
 
-        gameState.dropTarget.classList.remove("dropzone-active");
+        d.classList.remove("dropzone-active");
     }
 );
 
@@ -386,7 +386,7 @@ function scatter()
     let main = document.querySelector("#main");
     let first = document.querySelector("#first");
 
-    for ( let i = 0; i < 50; i++ )
+    for ( let i = 0; i < 5; i++ )
     {
         let item = first.cloneNode(false);
         let h = Math.random() * 360;
