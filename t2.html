@@ -25,15 +25,22 @@
     display: inline-block;
 }
 
+#main
+{
+    width: 40em;
+}
+
 .dropzone-active
 {
     outline: 0.3em solid rgba(255, 100, 100, 0.5);
 }
 
+/*
 .dragitem-dragging
 {
     opacity: 0.5;
 }
+*/
 
         </style>
     </head>
@@ -41,26 +48,32 @@
     <body>
 
         <div id="game">
+            <div>
+            
+                <div class="dropzone" data-role="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+                </div>
+                
+                <div class="dropzone" data-role="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+                </div>
+    
+            </div> 
 
             <div id="main" class="dropzone" data-role="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
                 <div id="first" class="dropitem"  data-role="dragitem" draggable="true" ondragstart="dragstart_move_handler(event)">
                 </div>
             </div>
+
+            <div>
             
-            <div class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+                <div class="dropzone" data-role="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+                </div>
+                
+                <div class="dropzone" data-role="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+                </div>
+
             </div>
 
         </div>
-
-        <div>
-        
-            <div class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
-            </div>
-            
-            <div class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
-            </div>
-
-        </div> 
 
         <script>
 
@@ -77,13 +90,14 @@ game.addEventListener("pointerdown",
 
         if (role == "dragitem")
         {
+            e.preventDefault();
             game.setPointerCapture(e.pointerId);
             // move to top / end of parent
             e.target.parentElement.append(e.target);
-            gameState.original = e.target;
-            gameState.dragging = e.target.cloneNode();
-            document.body.append(gameState.dragging);
-            gameState.dragging.classList.add("dragitem-dragging");
+            //gameState.original = e.target;
+            gameState.dragging = e.target; //.cloneNode();
+            main.append(gameState.dragging);
+            //gameState.dragging.classList.add("dragitem-dragging");
             gameState.offset = {x: e.offsetX, y: e.offsetY};
             gameState.start = {x: e.pageX, y: e.pageY};
         }
@@ -93,21 +107,93 @@ game.addEventListener("pointerdown",
 game.addEventListener("pointermove",
     e =>
     {
+        if (!gameState.dragging) return;
+
         console.log("pm", e.target.dataset.role, e);
+
+        let hits = document.elementsFromPoint(e.clientX, e.clientY);
+
+        let hit;
+        while ( hit = hits.pop() )
+        {
+            if (hit.dataset.role == "dropzone")
+            {
+                console.log("hit", hit);
+                hit.classList.add("dropzone-active");
+                break;
+            }
+        }
+
+        let t = gameState.dragging;
+
+        console.log(Number(t.dataset.y) + (e.pageY - gameState.start.y));
+
+        t.style.left = `${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px`;
+        t.style.top = `${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`;
+    }
+);
+
+function getTop(elem)
+{
+    let rect = elem.getBoundingClientRect();
+    return rect.top + window.scrollY;
+}
+
+function getLeft(elem)
+{
+    let rect = elem.getBoundingClientRect();
+    return rect.left + window.scrollX;
+}
+
+game.addEventListener("pointerup",
+    e =>
+    {
+        console.log("pu", e.target.dataset.role, e);
+
+        game.releasePointerCapture(e.pointerId);
 
         //let role = e.target.dataset.role;
 
-        //if (role == "dragitem")
+        let hits = document.elementsFromPoint(e.clientX, e.clientY);
+
+        console.log(hits);
+
+        let hit;
+        while ( hit = hits.pop() )
         {
-            let t = gameState.dragging;
-            //t.dataset.x = Number(t.dataset.x) + e.movementX
-            //t.dataset.y = Number(t.dataset.y) + e.movementY
-
-            console.log(t.dataset.x + (e.pageX - gameState.start.x));
-
-            t.style.left = `${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px`;
-            t.style.top = `${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`;
+            if (hit.dataset.role == "dropzone")
+            {
+                console.log("hit", hit);
+                break;
+            }
         }
+
+        let t = gameState.dragging;
+        let d = hit;
+
+        if (!t || !d) return;
+
+        gameState.dragging = null;
+
+        debugger;
+
+        //let x = t.offsetLeft - d.offsetLeft;
+        //let y = t.offsetTop - d.offsetTop;
+
+        let x = getLeft(t) - d.offsetLeft;
+        let y = getTop(t) - d.offsetTop;
+
+        console.log(Number(t.dataset.y) + (e.pageY - gameState.start.y));
+
+        t.dataset.x = x;
+        t.dataset.y = y;
+
+        t.style.left = `${x}px`;
+        t.style.top = `${y}px`;
+
+        d.append(t);
+
+        gameState.dropTarget.classList.remove("dropzone-active");
     }
 );
 
@@ -305,7 +391,7 @@ function scatter()
         let item = first.cloneNode(false);
         let h = Math.random() * 360;
         item.style.backgroundColor = `hsl(${h}deg, 100%, 75%)`;
-        let x = Math.random() * (main.offsetWidth - main.offsetWidth * 0.15); // 20em - 3em
+        let x = Math.random() * (main.offsetWidth - main.offsetWidth * 0.075); // 40em - 3em
         let y = Math.random() * (main.offsetHeight - main.offsetHeight * 0.15); // 20em - 3em
         item.dataset.x = x;
         item.dataset.y = y;
