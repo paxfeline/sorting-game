@@ -14,6 +14,7 @@
     background-color: pink;
     position: absolute;
     border-radius: 50%;
+    opacity: 80%;
 }
 
 .dropzone
@@ -200,199 +201,49 @@ game.addEventListener("pointerup",
         d.append(t);
 
         d.classList.remove("dropzone-active");
+
+        showFeedback();
     }
 );
 
-/*
-
-builder_globals = {};
-let touchTarget;
-
- // TODO: in this handler, set the value attribute explicitly so that it's copied
- function dragstart_move_handler(ev)
+function showFeedback()
 {
-	console.log(ev);
-	
-	//ev.target.firstElementChild.innerHTML = ev.target.firstElementChild.value;
-	builder_globals.data = ev.target.outerHTML;
-	builder_globals.dragged = ev.target;
-    builder_globals.offset = {x: ev.offsetX, y: ev.offsetY};
-
-    console.log(ev.offsetX, ev.offsetY);
-	
-	ev.stopPropagation();
-}
-
-function onDragLeave(event)
-{
-    console.log(event);
-    let found = getDropzone(event);
-    //if (event.target == found)
-        //found.classList.remove("dropzone-active");
- event.preventDefault();
-}
-
-
-function drop_handler(ev) {
-// if (!drop_ok(ev)) return;
- ev.preventDefault();
- // Get the id of the target and add the moved element to the target's DOM
- const data = builder_globals.data;
- //ev.target.style.backgroundColor = '';
- const temp = document.createElement("div");
-
-
-	 temp.innerHTML = data;
-
-
-     let found = getDropzone(ev);
-
-    temp.firstElementChild.style.left = `${ev.clientX - found.offsetLeft - builder_globals.offset.x}px`;
-    temp.firstElementChild.style.top = `${ev.clientY - found.offsetTop - builder_globals.offset.y}px`;
- 
-	found.append( temp.firstElementChild );
-
-    found.classList.remove("dropzone-active");
-	  
-    builder_globals.dragged.remove();
-
-
-
-    console.log(ev);
-    console.log(ev.pageX - ev.target.offsetLeft - builder_globals.offset.x, ev.pageY - ev.target.offsetTop - builder_globals.offset.y);
-}
-
-function dragover_handler(ev)
-{
-	console.log('doh', ev);
-	
-    let found = getDropzone(ev);
-    
-	if (builder_globals.dragged)
-	{
-
-        ev.preventDefault();
-	}
-}
-
-function getDropzone(ev)
-{
-    if (ev.target.classList.contains("dropzone"))
-        return ev.target;
-    else if (ev.target.parentElement.classList.contains("dropzone"))
-        return ev.target.parentElement;
-}
-
-function dragenter_handler(ev)
-{
-	console.log('deh', ev);
-
-    let found = getDropzone(ev);
-	
-	if (found && builder_globals.dragged)
-		//&& drop_ok(ev))
-	{
-        ev.dataTransfer.dropEffect = "move";
-			
-		found.classList.add("dropzone-active");
-        //console.log("active", ev.target);
-
-        ev.preventDefault();
-	}
-}
-
-function addTouchEvents()
-{
-    let items = document.querySelectorAll(".dropitem");
-    items.forEach(
-        el =>
-        {
-            console.log(el);
-            el.addEventListener("touchstart",
-                e =>
-                {
-                    console.log("ts", e);
-                    let de = new DragEvent("dragstart", {options: e.targetTouches[0]});
-                    el.dispatchEvent(de);
-                }
-            );
-            el.addEventListener("touchmove",
-                e =>
-                {
-                    console.log("tm-1", e);
-                    let de = new DragEvent("drag", {options: e.targetTouches[0]});
-                    el.dispatchEvent(de);
-                }
-            );
-            el.addEventListener("touchend",
-                e =>
-                {
-                    console.log("te-1", e);
-                    let de = new DragEvent("dragend", {options: e.targetTouches[0]});
-                    el.dispatchEvent(de);
-                }
-            );
-        }
-    )
-
-    document.body.addEventListener("touchmove",
-        e =>
-        {
-            console.log("tm", e);
-            if (e.target != touchTarget)
-            {
-                if (touchTarget)
-                {
-                    let de = new DragEvent("dragleave", {options: e.targetTouches[0]});
-                    touchTarget.dispatchEvent(de);
-                }
-                touchTarget = e.target;
-                let de = new DragEvent("dragenter", {options: e.targetTouches[0]});
-                touchTarget.dispatchEvent(de);
-            }
-            else if (touchTarget)
-            {
-                let de = new DragEvent("dragover", {options: e.targetTouches[0]});
-                touchTarget.dispatchEvent(de);
-            }
-        }
-    );
-
-    document.body.addEventListener("touchend",
-        e =>
-        {
-            console.log("te", e);
-            if (touchTarget)
-            {
-                let de = new DragEvent("drop", {options: e.targetTouches[0]});
-                touchTarget.dispatchEvent(de);
-                touchTarget = null;
-            }
-        }
-    );
-
     let zones = document.querySelectorAll(".dropzone");
+
     zones.forEach(
-        el =>
+        zone =>
         {
-            console.log(el);
-            el.addEventListener("touchmove",
-                e =>
+            let jewels = zone.querySelectorAll(".dropitem");
+            let low = Number(jewels[0]?.dataset.h);
+            let high = Number(jewels[0]?.dataset.h);
+            jewels.forEach(
+                jewel =>
                 {
+                    console.log("found h", jewel.dataset.h);
+                    let h = Number(jewel.dataset.h);
+                    if (h < low)
+                    {
+                        low = h;
+                    }
+                    else if (h > high)
+                    {
+                        high = h;
+                    }
                 }
-            )
+            );
+            range = 255 - ((high - low) * (255/360));
+            zone.style.outline = `1em solid rgb(${range},${range},${range})`;
+            console.log(high - low, high, low, zone);
         }
     );
 }
-
-*/
 
 function scatter()
 {
     let main = document.querySelector("#main");
     let first = document.querySelector("#first");
 
-    for ( let i = 0; i < 5; i++ )
+    for ( let i = 0; i < 500; i++ )
     {
         let item = first.cloneNode(false);
         let h = Math.random() * 360;
@@ -401,6 +252,8 @@ function scatter()
         let y = Math.random() * (main.offsetHeight - main.offsetHeight * 0.15); // 20em - 3em
         item.dataset.x = x;
         item.dataset.y = y;
+        item.dataset.h = h;
+        console.log("h", h);
         item.style.left = `${x}px`;
         item.style.top = `${y}px`;
         item.removeAttribute("id");
@@ -411,6 +264,8 @@ function scatter()
 }
 
 scatter();
+
+showFeedback();
 
         </script>
 
