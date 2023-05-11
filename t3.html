@@ -2,7 +2,7 @@
     <head>
         <style>
 
-.dropitem
+.dragitem
 {
     width: 3em;
     height: 3em;
@@ -32,7 +32,7 @@
         <div>
 
             <div id="main" class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
-                <div id="first" class="dropitem" draggable="true" ondragstart="dragstart_move_handler(event)">
+                <div id="first" class="dragitem" draggable="true" ondragstart="dragstart_move_handler(event)">
                 </div>
             </div>
             
@@ -151,7 +151,7 @@ function dragenter_handler(ev)
 
 function addTouchEvents()
 {
-    let items = document.querySelectorAll(".dropitem");
+    let items = document.querySelectorAll(".dragitem");
     items.forEach(
         el =>
         {
