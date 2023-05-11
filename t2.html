@@ -2,12 +2,18 @@
     <head>
         <style>
 
+#game
+{
+    touch-action: none;
+}
+
 .dropitem
 {
     width: 3em;
     height: 3em;
     background-color: pink;
     position: absolute;
+    border-radius: 50%;
 }
 
 .dropzone
@@ -24,15 +30,20 @@
     outline: 0.3em solid rgba(255, 100, 100, 0.5);
 }
 
+.dragitem-dragging
+{
+    opacity: 0.5;
+}
+
         </style>
     </head>
 
     <body>
 
-        <div>
+        <div id="game">
 
-            <div id="main" class="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
-                <div id="first" class="dropitem" draggable="true" ondragstart="dragstart_move_handler(event)">
+            <div id="main" class="dropzone" data-role="dropzone" ondragleave="onDragLeave(event)" ondrop="drop_handler(event)" ondragover="dragover_handler(event)" ondragenter="dragenter_handler(event)">
+                <div id="first" class="dropitem"  data-role="dragitem" draggable="true" ondragstart="dragstart_move_handler(event)">
                 </div>
             </div>
             
@@ -52,7 +63,53 @@
         </div> 
 
         <script>
-            
+
+let game = document.querySelector("#game");
+
+let gameState = {};
+
+game.addEventListener("pointerdown",
+    e =>
+    {
+        console.log("pd", e);
+
+        let role = e.target.dataset.role;
+
+        if (role == "dragitem")
+        {
+            game.setPointerCapture(e.pointerId);
+            // move to top / end of parent
+            e.target.parentElement.append(e.target);
+            gameState.original = e.target;
+            gameState.dragging = e.target.cloneNode();
+            document.body.append(gameState.dragging);
+            gameState.dragging.classList.add("dragitem-dragging");
+            gameState.offset = {x: e.offsetX, y: e.offsetY};
+        }
+    }
+);
+
+game.addEventListener("pointermove",
+    e =>
+    {
+        console.log("pm", e.target.dataset.role, e);
+
+        let role = e.target.dataset.role;
+
+        //if (role == "dragitem")
+        {
+            let t = gameState.dragging;
+            t.dataset.x = Number(t.dataset.x) + e.movementX
+            t.dataset.y = Number(t.dataset.y) + e.movementY
+
+            t.style.left = `${t.dataset.x}px`;
+            t.style.top = `${t.dataset.y}px`;
+        }
+    }
+);
+
+/*
+
 builder_globals = {};
 let touchTarget;
 
@@ -233,6 +290,8 @@ function addTouchEvents()
     );
 }
 
+*/
+
 function scatter()
 {
     let main = document.querySelector("#main");
@@ -243,18 +302,20 @@ function scatter()
         let item = first.cloneNode(false);
         let h = Math.random() * 360;
         item.style.backgroundColor = `hsl(${h}deg, 100%, 75%)`;
-        let x = Math.random() * 20;
-        let y = Math.random() * 20;
-        item.style.left = `${x}em`;
-        item.style.top = `${y}em`;
+        let x = Math.random() * (main.offsetWidth - main.offsetWidth * 0.15); // 20em - 3em
+        let y = Math.random() * (main.offsetHeight - main.offsetHeight * 0.15); // 20em - 3em
+        item.dataset.x = x;
+        item.dataset.y = y;
+        item.style.left = `${x}px`;
+        item.style.top = `${y}px`;
         item.removeAttribute("id");
         main.append(item);
     }
+
+    first.remove();
 }
 
 scatter();
-
-addTouchEvents();
 
         </script>
 
