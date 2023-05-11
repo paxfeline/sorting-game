@@ -84,7 +84,7 @@ let gameState = {};
 game.addEventListener("pointerdown",
     e =>
     {
-        console.log("pd", e);
+        //console.log("pd", e);
 
         let role = e.target.dataset.role;
 
@@ -109,7 +109,7 @@ game.addEventListener("pointermove",
     {
         if (!gameState.dragging) return;
 
-        console.log("pm", e.target.dataset.role, e);
+        //console.log("pm", e.target.dataset.role, e);
 
         let hits = document.elementsFromPoint(e.clientX, e.clientY);
 
@@ -118,15 +118,21 @@ game.addEventListener("pointermove",
         {
             if (hit.dataset.role == "dropzone")
             {
-                console.log("hit", hit);
+                //console.log("hit", hit);
                 hit.classList.add("dropzone-active");
+                if (gameState.hot != hit)
+                {
+                    if (gameState.hot)
+                        gameState.hot.classList.remove("dropzone-active");
+                    gameState.hot = hit;
+                }
                 break;
             }
         }
 
         let t = gameState.dragging;
 
-        console.log(`${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px\n${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`);
+        //console.log(`${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px\n${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`);
 
         t.style.left = `${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px`;
         t.style.top = `${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`;
@@ -148,7 +154,7 @@ function getLeft(elem)
 game.addEventListener("pointerup",
     e =>
     {
-        console.log("pu", e.target.dataset.role, e);
+        //console.log("pu", e.target.dataset.role, e);
 
         game.releasePointerCapture(e.pointerId);
 
@@ -156,14 +162,14 @@ game.addEventListener("pointerup",
 
         let hits = document.elementsFromPoint(e.clientX, e.clientY);
 
-        console.log(hits);
+        //console.log(hits);
 
         let hit;
         while ( hit = hits.pop() )
         {
             if (hit.dataset.role == "dropzone")
             {
-                console.log("hit", hit);
+                //console.log("hit", hit);
                 break;
             }
         }
@@ -175,7 +181,7 @@ game.addEventListener("pointerup",
 
         gameState.dragging = null;
 
-        debugger;
+        //debugger;
 
         //let x = t.offsetLeft - d.offsetLeft;
         //let y = t.offsetTop - d.offsetTop;
@@ -183,7 +189,7 @@ game.addEventListener("pointerup",
         let x = getLeft(t) - d.offsetLeft;
         let y = getTop(t) - d.offsetTop;
 
-        console.log(Number(t.dataset.y) + (e.pageY - gameState.start.y));
+        //console.log(Number(t.dataset.y) + (e.pageY - gameState.start.y));
 
         t.dataset.x = x;
         t.dataset.y = y;
