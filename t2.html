@@ -85,6 +85,7 @@ game.addEventListener("pointerdown",
             document.body.append(gameState.dragging);
             gameState.dragging.classList.add("dragitem-dragging");
             gameState.offset = {x: e.offsetX, y: e.offsetY};
+            gameState.start = {x: e.pageX, y: e.pageY};
         }
     }
 );
@@ -94,16 +95,18 @@ game.addEventListener("pointermove",
     {
         console.log("pm", e.target.dataset.role, e);
 
-        let role = e.target.dataset.role;
+        //let role = e.target.dataset.role;
 
         //if (role == "dragitem")
         {
             let t = gameState.dragging;
-            t.dataset.x = Number(t.dataset.x) + e.movementX
-            t.dataset.y = Number(t.dataset.y) + e.movementY
+            //t.dataset.x = Number(t.dataset.x) + e.movementX
+            //t.dataset.y = Number(t.dataset.y) + e.movementY
 
-            t.style.left = `${t.dataset.x}px`;
-            t.style.top = `${t.dataset.y}px`;
+            console.log(t.dataset.x + (e.pageX - gameState.start.x));
+
+            t.style.left = `${Number(t.dataset.x) + (e.pageX - gameState.start.x)}px`;
+            t.style.top = `${Number(t.dataset.y) + (e.pageY - gameState.start.y)}px`;
         }
     }
 );
