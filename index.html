@@ -130,6 +130,8 @@ game.addEventListener("pointerdown",
             console.log(gameState.dragging.classList);
             gameState.dragging.classList.add("dragitem-dragging");
             gameState.start = {x: e.pageX, y: e.pageY};
+            e.target.dataset.x = e.target.offsetLeft;
+            e.target.dataset.y = e.target.offsetTop;
         }
     }
 );
@@ -225,19 +227,18 @@ game.addEventListener("pointerup",
                 let x = getLeft(t) - d.offsetLeft;
                 let y = getTop(t) - d.offsetTop;
 
-                let left = x * 100 / d.offsetWidth;
-                let top = y * 100 / d.offsetHeight;
+                let left = x / (d.offsetWidth - t.offsetWidth);
+                let top = y / (d.offsetHeight - t.offsetHeight);
         
                 //console.log(Number(t.dataset.y) + (e.pageY - gameState.start.y));
-        
-                t.dataset.x = x;
-                t.dataset.y = y;
                 
                 t.dataset.left = left;
                 t.dataset.top = top;
         
                 t.style.left = `${left}%`;
                 t.style.top = `${top}%`;
+                t.style.left = `calc((100% - 10vmin) * ${left})`;
+                t.style.top = `calc((100% - 10vmin) * ${top})`;
         
                 d.append(t);
 
