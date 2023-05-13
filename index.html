@@ -36,8 +36,8 @@ body
 .dragitem
 {
     transition: transform 0.25s;
-    width: 10%;
-    height: 10%;
+    width: 10vmin;
+    height: 10vmin;
     background-color: pink;
     position: absolute;
     border-radius: 50%;
@@ -56,8 +56,9 @@ body
     flex: 1; /* => grow: 1 shrink: 1 basis: 0 */
 }
 
-#main
+#main > .dragitem
 {
+
 }
 
 .dropzone-active
@@ -128,7 +129,6 @@ game.addEventListener("pointerdown",
             gameState.dragging = e.target;
             console.log(gameState.dragging.classList);
             gameState.dragging.classList.add("dragitem-dragging");
-            gameState.offset = {x: e.offsetX, y: e.offsetY};
             gameState.start = {x: e.pageX, y: e.pageY};
         }
     }
@@ -224,14 +224,20 @@ game.addEventListener("pointerup",
         
                 let x = getLeft(t) - d.offsetLeft;
                 let y = getTop(t) - d.offsetTop;
+
+                let left = x * 100 / d.offsetWidth;
+                let top = y * 100 / d.offsetHeight;
         
                 //console.log(Number(t.dataset.y) + (e.pageY - gameState.start.y));
         
                 t.dataset.x = x;
                 t.dataset.y = y;
+                
+                t.dataset.left = left;
+                t.dataset.top = top;
         
-                t.style.left = `${x}px`;
-                t.style.top = `${y}px`;
+                t.style.left = `${left}%`;
+                t.style.top = `${top}%`;
         
                 d.append(t);
 
@@ -284,15 +290,15 @@ function scatter()
     {
         let item = first.cloneNode(false);
         let h = Math.random() * 360;
-        item.style.backgroundColor = `hsl(${h}deg, 100%, 75%)`;
-        let x = Math.random() * (main.offsetWidth - main.offsetWidth * 0.075); // 40em - 3em
-        let y = Math.random() * (main.offsetHeight - main.offsetHeight * 0.15); // 20em - 3em
-        item.dataset.x = x;
-        item.dataset.y = y;
         item.dataset.h = h;
+        item.style.backgroundColor = `hsl(${h}deg, 100%, 75%)`;
+        let left = Math.random();
+        let top = Math.random();
+        item.dataset.left = left;
+        item.dataset.top = top;
         //console.log("h", h);
-        item.style.left = `${x}px`;
-        item.style.top = `${y}px`;
+        item.style.left = `calc((100% - 10vmin) * ${left})`;
+        item.style.top = `calc((100% - 10vmin) * ${top})`;
         item.removeAttribute("id");
         main.append(item);
     }
